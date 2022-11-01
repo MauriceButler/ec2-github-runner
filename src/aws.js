@@ -1,9 +1,11 @@
+const fs = require('fs');
 const AWS = require('aws-sdk');
 const core = require('@actions/core');
 const config = require('./config');
 
 // User data scripts are run as the root user
 function buildUserDataScript(githubRegistrationToken, label) {
+  fs.appendFileSync('./foo.txt', `runnerHomeDir: ${config.input.runnerHomeDir} \n`);
   if (config.input.runnerHomeDir) {
     // If runner home directory is specified, we expect the actions-runner software (and dependencies)
     // to be pre-installed in the AMI, so we simply cd into that directory and then start the runner
@@ -32,6 +34,7 @@ async function startEc2Instance(label, githubRegistrationToken) {
   const ec2 = new AWS.EC2();
 
   const userData = buildUserDataScript(githubRegistrationToken, label);
+  fs.appendFileSync('./foo.txt', `userData: ${userData}`);
 
   const params = {
     ImageId: config.input.ec2ImageId,
